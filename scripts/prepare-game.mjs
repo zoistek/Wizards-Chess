@@ -1,0 +1,14 @@
+import {build} from 'esbuild';
+import {readFile,readdir,writeFile,mkdir} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import path from 'node:path';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const config=JSON.parse(await readFile(path.join(root,'config.json'),'utf8'));
+const models={};for(const file of await readdir(path.join(root,'game/models')))if(file.endsWith('.bin'))models[file.slice(0,-4)]=(await readFile(path.join(root,'game/models',file))).toString('base64');
+const result=await build({absWorkingDir:root,entryPoints:['game/src/main.tsx'],bundle:true,minify:true,jsx:'automatic',write:false,outdir:'assets',entryNames:'game',legalComments:'eof'});
+const js=result.outputFiles.find(f=>f.path.endsWith('.js')).text.replace(/<\/script/gi,'<\\/script');
+const css=result.outputFiles.find(f=>f.path.endsWith('.css')).text;
+const runtime={api:config.supabaseUrl+'/functions/v1/'+config.functionName,publishableKey:config.publishableKey,room:''};
+const html=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><title>Wizards Chess Test</title><style>${css}</style></head><body><div id="root"></div><script>window.WC_CONFIG=${JSON.stringify(runtime)};window.WC_MODEL_DATA=${JSON.stringify(models)};</script><script>${js}</script><script>if(window.ReactNativeWebView){window.ReactNativeWebView.postMessage(JSON.stringify({type:'ready'}));}else{window.WC_CONFIG.room=new URLSearchParams(location.search).get('room')||'';window.WC_BOOT();}</script></body></html>`;
+await mkdir(path.join(root,'assets'),{recursive:true});await writeFile(path.join(root,'assets/game.html'),html);
+console.log(`Prepared game: ${Object.keys(models).length} original model files, ${(Buffer.byteLength(html)/1024/1024).toFixed(1)} MiB. No EAS build started.`);

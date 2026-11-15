@@ -1,0 +1,45 @@
+{
+  "name": "wizards-chess",
+  "version": "0.1.0",
+  "main": "index.ts",
+  "dependencies": {
+    "chess.js": "1.4.0",
+    "expo": "~58.0.25",
+    "expo-asset": "~58.0.21",
+    "expo-clipboard": "~58.0.4",
+    "expo-crypto": "~58.0.8",
+    "expo-linking": "~58.0.17",
+    "expo-secure-store": "~58.0.3",
+    "expo-status-bar": "~58.0.5",
+    "fflate": "0.8.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-safe-area-context": "~5.11.1",
+    "react-native-webview": "14.0.1",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "@types/react": "~19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/three": "0.170.0",
+    "esbuild": "0.28.2",
+    "tsx": "4.21.0",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "npm run preview:web",
+    "prepare:game": "node scripts/prepare-game.mjs",
+    "prestart": "npm run prepare:game",
+    "preview:web": "npm run prepare:game && node scripts/preview.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "eas-build-post-install": "npm run prepare:game",
+    "test:live": "node tests/live-backend.mjs"
+  },
+  "private": true
+}

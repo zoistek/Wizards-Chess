@@ -1,0 +1,3 @@
+project_id = "wizards-chess-test"
+[functions.wizards-chess-test]
+verify_jwt = false

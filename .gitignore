@@ -1,0 +1,15 @@
+node_modules/
+.expo/
+dist/
+web-dist/
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p12
+credentials.json
+android/
+ios/
+.DS_Store
+supabase/.temp/

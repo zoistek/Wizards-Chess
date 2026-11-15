@@ -53,3 +53,11 @@ The original animation engine omits en passant, promotion choice, repetition and
 The GitHub token grants repository access, not Expo account access. The existing Expo project's UUID has not yet been independently verified. Before an **approved** cloud build, set `EXPO_PROJECT_ID` to that existing project's ID and verify its owner/slug. Do not create a replacement project or start a build to obtain it.
 
 `eas.json` includes a manually selected internal Android APK profile (`preview`) and a store AAB profile (`production`). Neither starts anything by itself. Test package IDs use `.test` to avoid replacing a future production app. Production branding, final Android package ID and store readiness are outside this first test branch.
+
+## Hosted browser test
+
+The `docs/` folder contains the same bundled game as the native app, connected to
+the isolated Supabase test backend. GitHub Pages serves this folder from
+`test/expo-app`. Updating this preview does not start an Expo build.
+Browser previews test the game and multiplayer. Native sharing, app deep links,
+and Android WebView performance still require a phone app test later.

@@ -2,7 +2,7 @@
 
 Expo SDK 58 app retaining the original 3D cathedral, fire, chess characters, camera controls, bot and capture animations. The existing browser renderer runs inside a bundled, hardware-accelerated native WebView; it does not load the WordPress website. All seven models, embedded textures and 24 animation clips are packaged in the app. Solo bot play works offline after installation.
 
-The approved app is promoted to `main`; `test/expo-app` remains available for review. The user approved an internal Android APK build. No store submission or automatic build workflow is configured.
+The approved app is promoted to `main`; `test/expo-app` remains available for review. The user approved an internal Android APK build. No store submission or automatic push-triggered build is configured. The manual Android preview workflow uses the existing GitHub `EXPO` secret.
 
 ## Review without an EAS build
 
@@ -50,7 +50,7 @@ The original animation engine omits en passant, promotion choice, repetition and
 
 ## Existing Expo project and build approval
 
-The GitHub token grants repository access, not Expo account access. The existing Expo project's UUID has not yet been independently verified. Before an **approved** cloud build, set `EXPO_PROJECT_ID` to that existing project's ID and verify its owner/slug. Do not create a replacement project or start a build to obtain it.
+The existing Expo project was verified using the repository secret `EXPO`: `@zoistek/wizards-chess`, UUID `1d666e75-5074-4a05-be7e-4eba46ca7b7b`. The app config links to this existing project. The manual Android preview workflow verifies the same UUID before starting an approved build; it never creates a replacement project.
 
 `eas.json` includes a manually selected internal Android APK profile (`preview`) and a store AAB profile (`production`). Neither starts anything by itself. Test package IDs use `.test` to avoid replacing a future production app. The generated black-and-gold wizard knight icon is configured as the native launcher icon. Final production package ID and store readiness remain separate from internal APK testing.
 

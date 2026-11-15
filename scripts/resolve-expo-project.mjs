@@ -11,7 +11,7 @@ for(const account of meActor.accounts){
  if(app?.byFullName)matches.push(app.byFullName);
 }
 if(matches.length!==1)throw new Error(`Expected exactly one existing wizards-chess project; found ${matches.length}. No project was created or build started.`);
-const app=matches[0];const linked=app.githubRepository?.metadata;
+const app=matches[0];if(app.id!=='1d666e75-5074-4a05-be7e-4eba46ca7b7b')throw new Error('The existing Expo project ID changed; refusing to build.');const linked=app.githubRepository?.metadata;
 if(linked&&(linked.githubRepoOwnerName.toLowerCase()!=='zoistek'||linked.githubRepoName.toLowerCase()!=='wizards-chess'))throw new Error('Expo project links to a different repository.');
 console.log(JSON.stringify({projectId:app.id,owner:app.ownerAccount.name,slug:app.slug,fullName:app.fullName,repository:linked||null}));
 appendFileSync(process.env.GITHUB_ENV,`EXPO_PROJECT_ID=${app.id}\nEXPO_OWNER=${app.ownerAccount.name}\n`);

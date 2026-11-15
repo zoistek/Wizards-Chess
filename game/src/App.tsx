@@ -32,11 +32,13 @@ export default function App() {
   }, []);
 
   const handleRestoreUI = () => {
+    setMobileSheetOpen(false);
     const win = window as unknown as { wizardChess?: { toggleUI?: (force?: boolean) => void } };
     if (win.wizardChess?.toggleUI) {
       win.wizardChess.toggleUI(false);
     } else {
       document.body.classList.remove('cinematic-ui-hidden');
+      const restore=document.getElementById('btn-show-ui');if(restore)restore.hidden=true;
       const btnHide = document.getElementById('btn-hide-ui');
       if (btnHide) btnHide.textContent = 'Hide UI [H]';
     }
@@ -79,10 +81,12 @@ export default function App() {
 
       <button
         type="button"
-        className="hud-btn mobile-only-restore-ui"
-        id="btn-mobile-show-ui"
+        className="hud-btn ui-restore"
+        id="btn-show-ui"
+        hidden
+        aria-controls="hud-top hud-bottom"
         onClick={handleRestoreUI}
-        title="Show HUD Controls"
+        title="Show game controls"
       >
         Show UI
       </button>

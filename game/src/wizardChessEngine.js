@@ -3233,10 +3233,15 @@ export function initWizardChess() {
           ? forceHidden
           : !document.body.classList.contains('cinematic-ui-hidden');
       document.body.classList.toggle('cinematic-ui-hidden', shouldHide);
+      const restore=document.getElementById('btn-show-ui');
+      if(restore)restore.hidden=!shouldHide;
       const btnHide = document.getElementById('btn-hide-ui');
       if (btnHide) {
         btnHide.textContent = shouldHide ? 'Show UI [H]' : 'Hide UI [H]';
       }
+      const compact=window.matchMedia('(max-width: 768px), (pointer: coarse) and (max-height: 500px)').matches;
+      const focusTarget=shouldHide?restore:document.getElementById(compact?'btn-mobile-controls':'btn-hide-ui');
+      focusTarget?.focus({preventScroll:true});
       return shouldHide;
     }
 

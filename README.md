@@ -57,9 +57,8 @@ The GitHub token grants repository access, not Expo account access. The existing
 ## Hosted browser test
 
 The `docs/` folder contains the same bundled game as the native app, connected to
-the isolated Supabase test backend. It is prepared for GitHub Pages from `test/expo-app`, but GitHub rejected
-Pages activation because the token lacks Pages permission. A private hosted
-preview is available instead through the link in the ChatGPT conversation.
-Sign in with the owner ChatGPT account to open it. Updating this preview does not start an Expo build.
+the isolated Supabase test backend. Live browser preview: https://zoistek.github.io/Wizards-Chess/
+GitHub Pages serves `docs/` from `test/expo-app`. No ChatGPT sign-in is required.
+Use separate devices or browser profiles to test opponent and spectator roles. Updating this preview does not start an Expo build.
 Browser previews test the game and multiplayer. Native sharing, app deep links,
 and Android WebView performance still require a phone app test later.

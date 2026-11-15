@@ -67,8 +67,9 @@ and Android WebView performance still require a phone app test later.
 
 Controls > Sound settings has independent switches for fire/wind ambience,
 stone sliding/grinding, and sword hits/statue breaking.
-Audio uses original procedural Web Audio effects; there are no film samples,
-remote audio downloads or additional services. Browser autoplay rules require
+Movement uses a bundled CC0 granite-on-granite recording (see licenses/stone-grind.txt).
+Other effects are procedural Web Audio. There are no film samples, runtime audio
+downloads or additional services. Browser autoplay rules require
 one tap/key press before audio starts. Ambience stays quiet and pauses in
 background tabs. Sound preferences persist in browser storage and, in the native
 app, SecureStore. Sound captions are not included.

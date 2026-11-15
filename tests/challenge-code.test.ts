@@ -7,7 +7,7 @@ test('pasted challenge codes accept spacing, hyphens and lowercase',()=>{
  for(const value of ['','ABCD','ABCDEF1234567','https://example.test/?room=ABCDEF123456'])assert.throws(()=>normalizeChallengeCode(value));
 });
 test('sharing contains a code only and no hosting address',()=>{
- const message=challengeCodeMessage('abcdef123456');assert.equal(message,'Wizards Chess challenge code: ABCDEF123456');assert(!/github|https?:|:\/\//i.test(message));
+ const message=challengeCodeMessage('abcdef123456');assert.equal(message,'Wizards chess challenge code: ABCDEF123456');assert(!/github|https?:|:\/\//i.test(message));
 });
 test('challenge screen offers separate create, paste/join and code-copy controls',()=>{
  const html=renderToStaticMarkup(createElement(Game));

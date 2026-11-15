@@ -1,8 +1,8 @@
-# Wizards Chess — app test branch
+# Wizards chess
 
 Expo SDK 58 app retaining the original 3D cathedral, fire, chess characters, camera controls, bot and capture animations. The existing browser renderer runs inside a bundled, hardware-accelerated native WebView; it does not load the WordPress website. All seven models, embedded textures and 24 animation clips are packaged in the app. Solo bot play works offline after installation.
 
-This work is on `test/expo-app`. **No EAS build, store submission or production merge is authorized or configured to run automatically.** Commit messages include `[skip ci] [eas skip]`. There are no build-trigger workflows.
+The approved app is promoted to `main`; `test/expo-app` remains available for review. The user approved an internal Android APK build. No store submission or automatic build workflow is configured.
 
 ## Review without an EAS build
 
@@ -11,7 +11,7 @@ npm ci
 npm start
 ```
 
-Open the QR code in Expo Go on Android. The first development launch downloads the bundled game asset from Metro; installed builds package that asset locally. Test Android hardware rendering before approving a native build. `npm run preview:web` also runs the same game in a browser at port 4173, useful for checking bot play and multiplayer without Expo.
+Open the QR code in Expo Go on Android. The first development launch downloads the bundled game asset from Metro; installed builds package that asset locally. Test Android hardware rendering during native build testing. `npm run preview:web` also runs the same game in a browser at port 4173, useful for checking bot play and multiplayer without Expo.
 
 ## Game modes
 
@@ -52,13 +52,13 @@ The original animation engine omits en passant, promotion choice, repetition and
 
 The GitHub token grants repository access, not Expo account access. The existing Expo project's UUID has not yet been independently verified. Before an **approved** cloud build, set `EXPO_PROJECT_ID` to that existing project's ID and verify its owner/slug. Do not create a replacement project or start a build to obtain it.
 
-`eas.json` includes a manually selected internal Android APK profile (`preview`) and a store AAB profile (`production`). Neither starts anything by itself. Test package IDs use `.test` to avoid replacing a future production app. Production branding, final Android package ID and store readiness are outside this first test branch.
+`eas.json` includes a manually selected internal Android APK profile (`preview`) and a store AAB profile (`production`). Neither starts anything by itself. Test package IDs use `.test` to avoid replacing a future production app. The generated black-and-gold wizard knight icon is configured as the native launcher icon. Final production package ID and store readiness remain separate from internal APK testing.
 
 ## Hosted browser test
 
 The `docs/` folder contains the same bundled game as the native app, connected to
 the isolated Supabase test backend. Live browser preview: https://zoistek.github.io/Wizards-Chess/
-GitHub Pages serves `docs/` from `test/expo-app`. No ChatGPT sign-in is required.
+GitHub Pages currently serves `docs/` from `test/expo-app`; the same approved source is also on `main`. No ChatGPT sign-in is required.
 Use separate devices or browser profiles to test opponent and spectator roles. Updating this preview does not start an Expo build.
 Browser previews test the game and multiplayer. Native sharing, app deep links,
 and Android WebView performance still require a phone app test later.
@@ -77,3 +77,11 @@ app, SecureStore. Sound captions are not included.
 Capture effects follow actual animation contact and shatter cues.
 Automated graph, mute, preference and lifecycle checks pass; the final audible
 mix still needs listening on real phone speakers/headphones.
+
+## Two-phone APK acceptance check
+
+Install the same preview APK on two physical Android phones. Phone A creates a challenge as White and copies the code. Phone B pastes that code and must receive Black. Make alternating legal moves and a capture; verify both boards and animations agree, then background/reopen each app and confirm its seat is retained. Repeat with A selecting Black. A third installation joining the code must watch without gaining move controls. Listen to the piece tap and capture effects, and check startup, fire and character animations on both devices. Backend and bundling checks do not substitute for this installed-app check.
+
+## Icon source
+
+`assets/wizards-chess-icon.png` was generated for this app using the built-in image generator. Prompt: a square black-and-gold dark fantasy chess app icon, a sculpted golden wizard knight, restrained amber magic, a firelit cathedral backdrop, strong small-size silhouette, full-bleed background without lettering or rounded corners. The native app label is exactly `Wizards chess`. The original 3D startup and animation engine are unchanged by this branding update.

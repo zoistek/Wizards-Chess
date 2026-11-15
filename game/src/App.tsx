@@ -13,7 +13,7 @@ export default function App() {
     if (initializedRef.current) return;
     initializedRef.current = true;
     document.getElementById('startup-status')?.remove();
-    try { initWizardChess(); } catch(error) { console.error('Wizard Chess startup:', error); const label=document.getElementById('loader-text'); if(label)label.textContent='The 3D game could not start. Please refresh or try another browser with WebGL enabled.'; }
+    try { initWizardChess(); } catch(error) { console.error('Wizards chess startup:', error); const label=document.getElementById('loader-text'); if(label)label.textContent='The 3D game could not start. Please refresh or try another browser with WebGL enabled.'; }
   }, []);
 
   useEffect(() => {
@@ -89,14 +89,14 @@ export default function App() {
             <label>Challenge code<input id="challenge-invite-code" readOnly aria-label="Your challenge code" /></label>
             <button id="challenge-copy">Copy challenge code</button>
             <button id="challenge-share-code">Share code</button>
-            <p className="challenge-help">Ask your friend to open Wizards Chess and paste this code into Join / watch game.</p>
+            <p className="challenge-help">Ask your friend to open Wizards chess and paste this code into Join / watch game.</p>
             <button id="challenge-another">Create another challenge</button>
           </div>
           <p id="challenge-status" role="status" aria-live="polite"></p><button id="challenge-close">View board</button><button id="challenge-bot">Play against bot</button>
         </div>
       </section>
       <div id="loading-overlay">
-        <div className="loader-title">Wizard Chess</div>
+        <div className="loader-title">Wizards chess</div>
         <div className="loader-bar-wrap">
           <div className="loader-bar" id="loader-bar"></div>
         </div>
@@ -120,7 +120,7 @@ export default function App() {
       <div id="hud-top">
         <div className="hud-group" id="hud-left">
           <div className="brand-pill">
-            <span className="brand-title">Wizard Chess</span>
+            <span className="brand-title">Wizards chess</span>
           </div>
           <div className="status-pill" id="status-pill">
             <span className="turn-dot" id="turn-dot"></span>

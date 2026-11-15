@@ -4,5 +4,5 @@ export function normalizeChallengeCode(value:string):string {
  return code;
 }
 export function challengeCodeMessage(code:string):string {
- return 'Wizards Chess challenge code: '+normalizeChallengeCode(code);
+ return 'Wizards chess challenge code: '+normalizeChallengeCode(code);
 }

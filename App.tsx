@@ -30,7 +30,7 @@ function Game(){
    const asset=await Asset.fromModule(require('./assets/game.html')).downloadAsync();
    if(!asset.localUri)throw new Error('The bundled game could not be opened.');
    if(active)setUri(asset.localUri);
-  })().catch(e=>{if(active)setError(e.message||'Could not start Wizards Chess.');});
+  })().catch(e=>{if(active)setError(e.message||'Could not start Wizards chess.');});
   return()=>{active=false;subscription.remove();booted.current=false;};
  },[attempt]);
  async function message(raw:string){
@@ -48,7 +48,7 @@ function Game(){
   }catch{web.current?.injectJavaScript("window.WC_NOTICE?.('That action could not be completed. Please try again.');true;");}
  }
  if(error)return <View style={styles.center}><Text style={styles.error}>{error}</Text><Pressable onPress={()=>{setError('');setUri('');setAttempt(n=>n+1)}}><Text style={styles.retry}>Try again</Text></Pressable></View>;
- if(!uri)return <View style={styles.center}><ActivityIndicator color="#d4af37"/><Text style={styles.loading}>Opening Wizards Chess…</Text></View>;
+ if(!uri)return <View style={styles.center}><ActivityIndicator color="#d4af37"/><Text style={styles.loading}>Opening Wizards chess…</Text></View>;
  return <WebView<{}> ref={web} source={{uri}} style={styles.game} originWhitelist={['file://*','about:blank']}
   javaScriptEnabled domStorageEnabled allowFileAccess allowUniversalAccessFromFileURLs
   allowingReadAccessToURL={uri.slice(0,uri.lastIndexOf('/')+1)} androidLayerType="hardware"

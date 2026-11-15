@@ -6,6 +6,10 @@ on:
         description: Start the approved Android APK build after project verification
         type: boolean
         default: false
+      share:
+        description: Enable public access to the completed Android APK and get its download URL
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -25,6 +29,9 @@ jobs:
           cache: npm
       - name: Verify existing Expo project
         run: node scripts/resolve-expo-project.mjs
+      - name: Share completed Android build
+        if: inputs.share
+        run: node scripts/share-expo-build.mjs
       - name: Install app dependencies
         if: inputs.build
         run: npm ci

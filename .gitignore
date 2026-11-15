@@ -13,3 +13,5 @@ android/
 ios/
 .DS_Store
 supabase/.temp/
+
+preview.local.json

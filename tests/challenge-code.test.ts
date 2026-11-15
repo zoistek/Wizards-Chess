@@ -17,5 +17,5 @@ test('challenge screen offers separate create, paste/join and code-copy controls
 
 test('sound settings show only the three audio switches, without subtitles',()=>{
  const html=renderToStaticMarkup(createElement(Game));
- assert(html.includes('Stone sliding / grinding'));assert(!html.includes('Sound captions'));assert(!html.includes('audio-event-caption'));assert(!html.includes('audio-ambient-caption'));assert.equal((html.match(/type="checkbox"/g)||[]).length,3);
+ assert(html.includes('Piece move sound'));assert(!html.includes('Sound captions'));assert(!html.includes('audio-event-caption'));assert(!html.includes('audio-ambient-caption'));assert.equal((html.match(/type="checkbox"/g)||[]).length,3);
 });

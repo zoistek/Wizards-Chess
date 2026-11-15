@@ -8,7 +8,7 @@ export function validSoundSettings(value:unknown):SoundSettings {
 
 export class WizardAudio {
  private settings={...DEFAULT_SOUND_SETTINGS};private loaded=false;
- private context:AudioContext|null=null;private master:GainNode|null=null;private buses:Partial<Record<'moves'|'captures'|'ambient',GainNode>>={};private noise:AudioBuffer|null=null;private slideNoise:AudioBuffer|null=null;private stoneDecode:Promise<void>|null=null;
+ private context:AudioContext|null=null;private master:GainNode|null=null;private buses:Partial<Record<'moves'|'captures'|'ambient',GainNode>>={};private noise:AudioBuffer|null=null;private moveSample:AudioBuffer|null=null;private moveDecode:Promise<void>|null=null;
  private slides=new Set<{source:AudioBufferSourceNode;nodes:AudioNode[]}>();
  private ambientNodes:AudioNode[]=[];private ambientSources:(AudioBufferSourceNode|OscillatorNode)[]=[];
  private crackleTimer:ReturnType<typeof setInterval>|null=null;
@@ -46,16 +46,16 @@ export class WizardAudio {
    for(let i=0;i<samples.length;i++){brown=(brown+(Math.random()*2-1)*.03)/1.03;samples[i]=brown*3;}
 
   }
-  try{if(this.context.state!=='running')await this.context.resume();await this.loadStoneRecording();this.startAmbient();}catch{}
+  try{if(this.context.state!=='running')await this.context.resume();await this.loadMoveSound();this.startAmbient();}catch{}
  }
- private loadStoneRecording(){
-  if(this.stoneDecode)return this.stoneDecode;
-  const encoded=window.WC_STONE_AUDIO,context=this.context;
+ private loadMoveSound(){
+  if(this.moveDecode)return this.moveDecode;
+  const encoded=window.WC_MOVE_AUDIO,context=this.context;
   if(!encoded||!context)return Promise.resolve();
   const raw=atob(encoded),bytes=new Uint8Array(raw.length);
   for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
-  this.stoneDecode=context.decodeAudioData(bytes.buffer).then(buffer=>{if(this.context===context)this.slideNoise=buffer}).catch(()=>{this.stoneDecode=null});
-  return this.stoneDecode;
+  this.moveDecode=context.decodeAudioData(bytes.buffer).then(buffer=>{if(this.context===context)this.moveSample=buffer}).catch(()=>{this.moveDecode=null});
+  return this.moveDecode;
  }
  private get active(){return this.context?.state==='running' && (typeof document==='undefined'||!document.hidden);}
  private noiseBurst(duration:number,gain:number,frequency:number,type:BiquadFilterType='lowpass',delay=0,category:'moves'|'captures'|'ambient'='captures'){
@@ -72,20 +72,20 @@ export class WizardAudio {
   volume.gain.setValueAtTime(.0001,start);volume.gain.exponentialRampToValueAtTime(gain,start+.005);volume.gain.exponentialRampToValueAtTime(.0001,start+duration);
   osc.connect(volume);volume.connect(this.buses[category]||this.master);osc.onended=()=>{osc.disconnect();volume.disconnect()};osc.start(start);osc.stop(start+duration+.02);
  }
- playMove(duration=.7){
+ playMove(){
   if(!this.getSettings().moves)return;
-  if(!this.active||!this.slideNoise){
+  if(!this.active||!this.moveSample){
    const requested=performance.now();
-   void this.unlock().then(()=>{if(this.active&&this.slideNoise&&performance.now()-requested<250)this.playMove(duration)});
+   void this.unlock().then(()=>{if(this.active&&this.moveSample&&performance.now()-requested<250)this.playMove()});
    return;
   }
-  if(!this.context||!this.slideNoise||!this.master)return;
-  const c=this.context,start=c.currentTime,length=Math.max(.08,duration),source=c.createBufferSource(),filter=c.createBiquadFilter(),volume=c.createGain();
-  source.buffer=this.slideNoise;source.loop=true;source.playbackRate.value=.87+Math.random()*.06;
-  // Recorded granite-on-granite friction keeps its natural low/mid stone resonance.
-  filter.type='lowpass';filter.frequency.value=3600;filter.Q.value=.7;
-  volume.gain.setValueAtTime(.0001,start);volume.gain.exponentialRampToValueAtTime(.7,start+.025);
-  volume.gain.setValueAtTime(.7,start+Math.max(.03,length-.08));volume.gain.exponentialRampToValueAtTime(.0001,start+length);
+  if(!this.context||!this.moveSample||!this.master)return;
+  const c=this.context,start=c.currentTime,length=this.moveSample.duration,source=c.createBufferSource(),filter=c.createBiquadFilter(),volume=c.createGain();
+  source.buffer=this.moveSample;source.loop=false;source.playbackRate.value=1;
+  // One quiet, dry piece-placement tap at arrival; no sound during the slide.
+  filter.type='lowpass';filter.frequency.value=4000;filter.Q.value=.7;
+  volume.gain.setValueAtTime(.0001,start);volume.gain.exponentialRampToValueAtTime(.55,start+.003);
+  volume.gain.setValueAtTime(.55,start+.006);volume.gain.exponentialRampToValueAtTime(.0001,start+length);
   source.connect(filter);filter.connect(volume);volume.connect(this.buses.moves||this.master);
   const slide={source,nodes:[source,filter,volume]};this.slides.add(slide);
   source.onended=()=>{slide.nodes.forEach(node=>node.disconnect());this.slides.delete(slide)};
@@ -122,7 +122,7 @@ export class WizardAudio {
  dispose(){
   this.stopMoves();this.stopAmbient();
   if(typeof document!=='undefined'){document.removeEventListener('pointerdown',this.onGesture);document.removeEventListener('click',this.onGesture);document.removeEventListener('keydown',this.onGesture);document.removeEventListener('visibilitychange',this.onVisibility);}
-  void this.context?.close();this.context=null;this.buses={};this.stoneDecode=null;this.slideNoise=null;this.attached=false;
+  void this.context?.close();this.context=null;this.buses={};this.moveDecode=null;this.moveSample=null;this.attached=false;
  }
 }
 export const wizardAudio=new WizardAudio();

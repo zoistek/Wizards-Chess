@@ -66,13 +66,14 @@ and Android WebView performance still require a phone app test later.
 ## Sound
 
 Controls > Sound settings has independent switches for fire/wind ambience,
-stone sliding/grinding, and sword hits/statue breaking.
-Movement uses a bundled CC0 granite-on-granite recording (see licenses/stone-grind.txt).
-Other effects are procedural Web Audio. There are no film samples, runtime audio
-downloads or additional services. Browser autoplay rules require
+a simple piece-placement tap, and sword hits/statue breaking.
+Movement uses an original short, quiet piece-placement tap, played once at the
+end of each move. There is no sliding/grinding loop. Other effects are procedural
+Web Audio. There are no film or chess.com samples, runtime audio downloads or
+additional services. Browser autoplay rules require
 one tap/key press before audio starts. Ambience stays quiet and pauses in
 background tabs. Sound preferences persist in browser storage and, in the native
 app, SecureStore. Sound captions are not included.
-Sliding audio lasts for each movement, including capture approaches and follow-through. Capture effects follow actual animation contact and shatter cues.
+Capture effects follow actual animation contact and shatter cues.
 Automated graph, mute, preference and lifecycle checks pass; the final audible
 mix still needs listening on real phone speakers/headphones.

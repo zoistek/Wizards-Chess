@@ -65,7 +65,7 @@ export default function App() {
         <div className="sound-card">
           <h2>Sound settings</h2>
           <p>Quiet ambience and cinematic chess effects.</p>
-          {([['ambient','Fire & wind ambience'],['moves','Stone sliding / grinding'],['captures','Sword hits & statue breaking']] as const).map(([key,label])=>(
+          {([['ambient','Fire & wind ambience'],['moves','Piece move sound'],['captures','Sword hits & statue breaking']] as const).map(([key,label])=>(
             <label className="sound-option" key={key}><span>{label}</span><input type="checkbox" checked={soundSettings[key]} onChange={e=>{wizardAudio.setSettings({[key]:e.target.checked});void wizardAudio.unlock();}} /></label>
           ))}
           <p className="sound-note">Sound starts after your first tap. Each sound category can be switched off separately.</p>

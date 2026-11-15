@@ -9,12 +9,12 @@ function fixture(){
   state='suspended';sampleRate=8000;currentTime=0;destination={};constructor(){created++}
   createGain=node;createOscillator=node;createBufferSource=node;createBiquadFilter=node;createDynamicsCompressor=node;
   createBuffer(_channels:number,length:number){return {getChannelData:()=>new Float32Array(length)}}
-  async decodeAudioData(){return {duration:.485,getChannelData:()=>new Float32Array(3880)}}
+  async decodeAudioData(){return {duration:.09,getChannelData:()=>new Float32Array(3880)}}
   async resume(){this.state='running'}async suspend(){this.state='suspended'}async close(){this.state='closed'}
  }
  const document={hidden:false,getElementById:()=>{domQueries++;return null},addEventListener:(type:string,fn:()=>void)=>events.set(type,fn),removeEventListener:(type:string)=>events.delete(type)};
  const descriptors=Object.fromEntries(['window','document','localStorage'].map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
- Object.defineProperty(globalThis,'window',{configurable:true,value:{AudioContext:Context,WC_STONE_AUDIO:'UklGRg==',ReactNativeWebView:{postMessage:(text:string)=>messages.push(JSON.parse(text))}}});
+ Object.defineProperty(globalThis,'window',{configurable:true,value:{AudioContext:Context,WC_MOVE_AUDIO:'UklGRg==',ReactNativeWebView:{postMessage:(text:string)=>messages.push(JSON.parse(text))}}});
  Object.defineProperty(globalThis,'document',{configurable:true,value:document});
  Object.defineProperty(globalThis,'localStorage',{configurable:true,value:{getItem:(key:string)=>stored.get(key)||null,setItem:(key:string,value:string)=>stored.set(key,value)}});
  const audio=new WizardAudio();
@@ -40,10 +40,10 @@ test('ambience does not duplicate and pauses while the app is hidden',async()=>{
  }finally{f.cleanup()}
 });
 
-test('stone sliding runs for the move duration and stops on reset',async()=>{
+test('piece placement is a short one-shot and can be stopped',async()=>{
  const f=fixture();try{
-  f.audio.setSettings({ambient:false});await f.audio.unlock();f.audio.playMove(1.6);
-  assert(f.stopTimes.some(time=>time!==undefined&&Math.abs(time-1.62)<.001));
+  f.audio.setSettings({ambient:false});await f.audio.unlock();f.audio.playMove();
+  assert(f.stopTimes.some(time=>time!==undefined&&Math.abs(time-.11)<.001));
   const stopped=f.stopped();f.audio.stopMoves();assert(f.stopped()>stopped);
  }finally{f.cleanup()}
 });

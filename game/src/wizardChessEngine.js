@@ -1727,6 +1727,7 @@ export function initWizardChess() {
     }
 
     function resetChessBoard(orientCamera = true, preserveScript = false) {
+      wizardAudio.stopMoves();
       if (aiTimer) {
         clearTimeout(aiTimer);
         aiTimer = null;
@@ -2124,7 +2125,6 @@ export function initWizardChess() {
 
       const captured = targetOnDest;
       const isCapture = Boolean(captured);
-      if(!isCapture)wizardAudio.playMove();
       isAnimatingMove = true;
       activeCamTransition = null;
       clearSquareHighlights();
@@ -2433,6 +2433,7 @@ export function initWizardChess() {
       const tApproach = isCapture
         ? Number((0.66 + Math.max(0, squaresMoved - 1) * 0.125).toFixed(3))
         : stdMoveDuration;
+      wizardAudio.playMove(tApproach);
       const tContact = isCapture ? (tApproach + CONTACT_CLIP_TIME / atkProfile.timeScale) : stdMoveDuration;
       const tImpact = isCapture ? (tApproach + BLOW_CLIP_TIME / atkProfile.timeScale) : stdMoveDuration;
       const tStrikeDone = isCapture ? (tImpact + 0.48) : stdMoveDuration;
@@ -2468,6 +2469,7 @@ export function initWizardChess() {
       let prevPiecePos = piece.mesh.position.clone();
 
       function finishMove() {
+        wizardAudio.stopMoves();
         resetBystandersToHome();
         boardState[fromR][fromC] = null;
         boardState[toR][toC] = piece;
@@ -2654,6 +2656,7 @@ export function initWizardChess() {
             if (!shatterTriggered && (atkClipTime >= BLOW_CLIP_TIME || elapsed >= tImpact + 0.06)) {
               shatterTriggered = true;
               wizardAudio.playShatter();
+              wizardAudio.playMove(Math.max(.08,totalDuration-elapsed));
               impactActualTime = elapsed;
               postShatterPiecePos.copy(piece.mesh.position);
               if (captured && captured.mesh) {

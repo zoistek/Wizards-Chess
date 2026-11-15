@@ -65,14 +65,13 @@ export default function App() {
         <div className="sound-card">
           <h2>Sound settings</h2>
           <p>Quiet ambience and cinematic chess effects.</p>
-          {([['ambient','Fire & wind ambience'],['moves','Piece movement'],['captures','Sword hits & statue breaking'],['subtitles','Sound captions']] as const).map(([key,label])=>(
+          {([['ambient','Fire & wind ambience'],['moves','Stone sliding / grinding'],['captures','Sword hits & statue breaking']] as const).map(([key,label])=>(
             <label className="sound-option" key={key}><span>{label}</span><input type="checkbox" checked={soundSettings[key]} onChange={e=>{wizardAudio.setSettings({[key]:e.target.checked});void wizardAudio.unlock();}} /></label>
           ))}
-          <p className="sound-note">Sound starts after your first tap. Captions can stay on even when sounds are muted.</p>
+          <p className="sound-note">Sound starts after your first tap. Each sound category can be switched off separately.</p>
           <button type="button" className="hud-btn" onClick={()=>setSoundOpen(false)}>Back to game</button>
         </div>
       </section>
-      <div className="sound-captions"><div id="audio-ambient-caption"></div><div id="audio-event-caption" role="status" aria-live="polite" aria-atomic="true"></div></div>
       <section id="challenge-panel" className="collapsed" aria-label="Multiplayer challenge">
         <div className="challenge-card">
           <h1>Challenge a friend</h1><p id="challenge-room">A duel in the sanctum. Two players, no timer.</p>

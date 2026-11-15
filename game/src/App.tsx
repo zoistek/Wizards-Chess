@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
+import {wizardAudio,DEFAULT_SOUND_SETTINGS,type SoundSettings} from './audio';
 import { initWizardChess } from './wizardChessEngine.js';
 
 export default function App() {
   const initializedRef = useRef(false);
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const [soundOpen,setSoundOpen]=useState(false);
+  const [soundSettings,setSoundSettings]=useState<SoundSettings>(DEFAULT_SOUND_SETTINGS);
+  useEffect(()=>{setSoundSettings(wizardAudio.getSettings());return wizardAudio.subscribe(setSoundSettings)},[]);
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -15,6 +19,7 @@ export default function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        setSoundOpen(false);
         setMobileSheetOpen(false);
       }
     };
@@ -31,8 +36,18 @@ export default function App() {
     };
   }, []);
 
+  useEffect(()=>{
+    if(!soundOpen)return;
+    const panel=document.getElementById('sound-panel');
+    const controls=panel?.querySelectorAll<HTMLElement>('input,button');
+    const first=controls?.[0],last=controls?.[controls.length-1];first?.focus();
+    const trap=(event:KeyboardEvent)=>{if(event.key!=='Tab')return;if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus()}};
+    panel?.addEventListener('keydown',trap);
+    return()=>{panel?.removeEventListener('keydown',trap);const compact=window.matchMedia('(max-width:768px), (pointer:coarse) and (max-height:500px)').matches;document.getElementById(compact?'btn-mobile-controls':'btn-sound')?.focus({preventScroll:true});};
+  },[soundOpen]);
+
   const handleRestoreUI = () => {
-    setMobileSheetOpen(false);
+    setMobileSheetOpen(false);setSoundOpen(false);
     const win = window as unknown as { wizardChess?: { toggleUI?: (force?: boolean) => void } };
     if (win.wizardChess?.toggleUI) {
       win.wizardChess.toggleUI(false);
@@ -46,6 +61,18 @@ export default function App() {
 
   return (
     <>
+      <section id="sound-panel" hidden={!soundOpen} aria-label="Sound settings" role="dialog" aria-modal="true">
+        <div className="sound-card">
+          <h2>Sound settings</h2>
+          <p>Quiet ambience and cinematic chess effects.</p>
+          {([['ambient','Fire & wind ambience'],['moves','Piece movement'],['captures','Sword hits & statue breaking'],['subtitles','Sound captions']] as const).map(([key,label])=>(
+            <label className="sound-option" key={key}><span>{label}</span><input type="checkbox" checked={soundSettings[key]} onChange={e=>{wizardAudio.setSettings({[key]:e.target.checked});void wizardAudio.unlock();}} /></label>
+          ))}
+          <p className="sound-note">Sound starts after your first tap. Captions can stay on even when sounds are muted.</p>
+          <button type="button" className="hud-btn" onClick={()=>setSoundOpen(false)}>Back to game</button>
+        </div>
+      </section>
+      <div className="sound-captions"><div id="audio-ambient-caption"></div><div id="audio-event-caption" role="status" aria-live="polite" aria-atomic="true"></div></div>
       <section id="challenge-panel" className="collapsed" aria-label="Multiplayer challenge">
         <div className="challenge-card">
           <h1>Challenge a friend</h1><p id="challenge-room">A duel in the sanctum. Two players, no timer.</p>
@@ -220,6 +247,7 @@ export default function App() {
 
           <div className="hud-divider" aria-hidden="true"></div>
           <div className="mobile-sheet-section-label">Display &amp; Gestures</div>
+          <button className="hud-btn" id="btn-sound" onClick={()=>{setMobileSheetOpen(false);setSoundOpen(true);void wizardAudio.unlock();}}>Sound settings</button>
 
           <button
             className="hud-btn"

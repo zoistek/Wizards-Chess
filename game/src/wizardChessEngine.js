@@ -1,3 +1,4 @@
+import {wizardAudio} from './audio';
 import {normalizeChallengeCode,challengeCodeMessage} from '../../src/challengeCode';
 import { decompressSync } from 'fflate';
 import * as THREE_NS from 'three';
@@ -2123,6 +2124,7 @@ export function initWizardChess() {
 
       const captured = targetOnDest;
       const isCapture = Boolean(captured);
+      if(!isCapture)wizardAudio.playMove();
       isAnimatingMove = true;
       activeCamTransition = null;
       clearSquareHighlights();
@@ -2636,6 +2638,7 @@ export function initWizardChess() {
               (atkClipTime >= CONTACT_CLIP_TIME || elapsed >= tContact + 0.06)
             ) {
               defenderFlinchTriggered = true;
+              wizardAudio.playHit();
               if (captured) {
                 playPieceClip(captured, 'Shatter', false, 0.04);
                 impactFlashLight.position.set(
@@ -2650,6 +2653,7 @@ export function initWizardChess() {
             // Blow Burst: after visible weapon impact & follow-through, defender explodes into stone shards!
             if (!shatterTriggered && (atkClipTime >= BLOW_CLIP_TIME || elapsed >= tImpact + 0.06)) {
               shatterTriggered = true;
+              wizardAudio.playShatter();
               impactActualTime = elapsed;
               postShatterPiecePos.copy(piece.mesh.position);
               if (captured && captured.mesh) {
@@ -4751,6 +4755,7 @@ export function initWizardChess() {
       document.getElementById('challenge-start').disabled=false;
       document.getElementById('challenge-join').disabled=false;
       if(invited) { aiAutoPlay=false; if(aiTimer){clearTimeout(aiTimer);aiTimer=null;} }
+      wizardAudio.attachBrowser();
       animate();
     })();
 }

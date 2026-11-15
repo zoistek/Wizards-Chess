@@ -48,12 +48,22 @@ export default function App() {
         <div className="challenge-card">
           <h1>Challenge a friend</h1><p id="challenge-room">A duel in the sanctum. Two players, no timer.</p>
           <div id="challenge-entry">
-            <label>Your nickname<input id="challenge-name" maxLength={24} autoComplete="nickname" placeholder="Enter your name" /></label>
-            <label>Your colour<select id="challenge-color"><option value="w">White — first move</option><option value="b">Black</option><option value="random">Random</option></select></label>
-            <label>Room code (to join)<input id="challenge-code" maxLength={12} placeholder="Leave empty to create a challenge" onChange={e=>{const b=document.getElementById('challenge-start');if(b)b.textContent=e.target.value.trim()?'Join / watch game':'Create challenge';}} /></label>
-            <button id="challenge-start" disabled>Loading the game…</button>
+            <label>Your nickname (optional)<input id="challenge-name" maxLength={24} autoComplete="nickname" placeholder="Your name" /></label>
+            <label>Play as<select id="challenge-color"><option value="w">White — first move</option><option value="b">Black</option><option value="random">Random</option></select></label>
+            <button id="challenge-start" disabled>Create challenge</button>
+            <div className="challenge-join-section">
+              <label>Have a challenge code?<input id="challenge-code" maxLength={16} autoCapitalize="characters" autoCorrect="off" spellCheck={false} placeholder="Paste challenge code" enterKeyHint="go" /></label>
+              <button id="challenge-join" disabled>Join / watch game</button>
+              <p className="challenge-help">Paste a code to join. The first guest plays; later guests watch.</p>
+            </div>
           </div>
-          <div id="challenge-share" hidden><label>Invite link<input id="challenge-link" readOnly /></label><button id="challenge-copy">Copy challenge link</button><button id="challenge-share-link">Share challenge</button><button id="challenge-another">Create another challenge</button></div>
+          <div id="challenge-share" hidden>
+            <label>Challenge code<input id="challenge-invite-code" readOnly aria-label="Your challenge code" /></label>
+            <button id="challenge-copy">Copy challenge code</button>
+            <button id="challenge-share-code">Share code</button>
+            <p className="challenge-help">Ask your friend to open Wizards Chess and paste this code into Join / watch game.</p>
+            <button id="challenge-another">Create another challenge</button>
+          </div>
           <p id="challenge-status" role="status" aria-live="polite"></p><button id="challenge-close">View board</button><button id="challenge-bot">Play against bot</button>
         </div>
       </section>

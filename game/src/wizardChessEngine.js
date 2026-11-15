@@ -1,3 +1,4 @@
+import {normalizeChallengeCode,challengeCodeMessage} from '../../src/challengeCode';
 import { decompressSync } from 'fflate';
 import * as THREE_NS from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -3806,6 +3807,7 @@ export function initWizardChess() {
     // =========================================================================
     let onlineReady = false;
     let networkBusy = false;
+    let joiningRoom = false;
     let replayBusy = false;
     let pendingRoom = null;
     const config = window.WC_CONFIG;
@@ -3829,7 +3831,7 @@ export function initWizardChess() {
         const state=pendingRoom;
         if(!state){replayBusy=false;return;}
         onlineReady=state.whiteJoined&&state.blackJoined;
-        document.getElementById('challenge-room').textContent=onlineReady ? `${state.names.w} (White) vs ${state.names.b} (Black)${playerColor==='spectator'?' — You are watching':''}` : 'Waiting for your opponent — share the link below';
+        document.getElementById('challenge-room').textContent=onlineReady ? `${state.names.w} (White) vs ${state.names.b} (Black)${playerColor==='spectator'?' — You are watching':''}` : 'Waiting for your opponent — share the code below';
         if(appliedMoveSeq<state.moves.length){
           const m=state.moves[appliedMoveSeq];
           if(!executeChessMove(m.from.r,m.from.c,m.to.r,m.to.c,{fromRemote:true})){replayBusy=false;tell('Board could not reconnect. Please refresh.');return;}
@@ -3846,17 +3848,17 @@ export function initWizardChess() {
       finally{networkBusy=false;}
     }
     async function enterChallenge(join){
-      const button=document.getElementById('challenge-start');button.disabled=true;
+      if(joiningRoom)return;joiningRoom=true;
+      const buttons=['challenge-start','challenge-join'].map(id=>document.getElementById(id));buttons.forEach(button=>button.disabled=true);
       try{
-        const name=document.getElementById('challenge-name').value.trim();if(!name)throw new Error('Enter a nickname to play.');
-        const code=document.getElementById('challenge-code').value.trim().toUpperCase();
+        const name=document.getElementById('challenge-name').value.trim() || (join?'Guest':'Host');
+        const code=join?normalizeChallengeCode(document.getElementById('challenge-code').value):'';
         const data=await requestRoom(join?'/'+code+'/join':'',{name,color:document.getElementById('challenge-color').value});
         roomCode=data.room.code;playerColor=data.color || 'spectator';gameMode='multi';aiAutoPlay=false;scriptedGameActive=false;appliedMoveSeq=0;
         if(aiTimer){clearTimeout(aiTimer);aiTimer=null;}
         resetChessBoard(true,false);
         gameStorage.setItem('wc_last_room',roomCode);
-        const parentUrl=new URL(window.top === window ? location.href : (document.referrer || location.href));parentUrl.searchParams.delete('wizard_chess_embed');parentUrl.searchParams.set('room',roomCode);
-        document.getElementById('challenge-link').value=window.WC_CHALLENGE_BASE ? window.WC_CHALLENGE_BASE+roomCode : parentUrl.href;
+        document.getElementById('challenge-invite-code').value=roomCode;
         document.getElementById('challenge-entry').hidden=true;
         document.getElementById('challenge-share').hidden=false;
         document.getElementById('challenge-close').hidden=false;
@@ -3866,23 +3868,29 @@ export function initWizardChess() {
         if(join && data.room.whiteJoined && data.room.blackJoined)document.getElementById('challenge-panel').classList.add('collapsed');
         roomPollTimer=setInterval(async()=>{if(networkBusy)return;try{const d=await requestRoom('/'+roomCode+'/state');applyRemoteRoomState(d.room);tell('');}catch(e){tell('Connection interrupted. Retrying…');}},1800);
         tell('');
-      }catch(error){tell(error.message);}finally{button.disabled=false;}
+      }catch(error){tell(error.message);}finally{joiningRoom=false;buttons.forEach(button=>button.disabled=false);}
     }
-    document.getElementById('challenge-start').onclick=()=>enterChallenge(Boolean(document.getElementById('challenge-code').value.trim()));
+    document.getElementById('challenge-start').onclick=()=>enterChallenge(false);
+    document.getElementById('challenge-join').onclick=()=>enterChallenge(true);
+    document.getElementById('challenge-code').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();if(!document.getElementById('challenge-join').disabled)enterChallenge(true);}});
+    document.getElementById('challenge-code').addEventListener('paste',()=>setTimeout(()=>{
+      if(document.getElementById('challenge-join').disabled)return;
+      try{normalizeChallengeCode(document.getElementById('challenge-code').value);enterChallenge(true);}catch{}
+    },0));
     window.WC_NOTICE=tell;
     window.WC_OPEN_ROOM=code=>{
       config.room=code;document.getElementById('challenge-code').value=code;
-      document.getElementById('challenge-start').textContent='Join / watch game';
+      document.getElementById('challenge-entry').hidden=false;
+      document.getElementById('challenge-share').hidden=true;
       document.getElementById('challenge-panel').classList.remove('collapsed');
     };
     document.getElementById('challenge-copy').onclick=async()=>{
-      if(window.ReactNativeWebView){window.ReactNativeWebView.postMessage(JSON.stringify({type:'copy',code:roomCode}));return;}
-      const input=document.getElementById('challenge-link');try{await navigator.clipboard.writeText(input.value);tell('Challenge link copied.');}catch{input.select();tell('Select and copy the link above.');}
+      if(window.ReactNativeWebView){window.ReactNativeWebView.postMessage(JSON.stringify({type:'copy-code',code:roomCode}));return;}
+      const input=document.getElementById('challenge-invite-code');try{await navigator.clipboard.writeText(roomCode);tell('Challenge code copied.');}catch{input.select();tell('Select and copy the challenge code above.');}
     };
-    document.getElementById('challenge-share-link').onclick=async()=>{
-      if(window.ReactNativeWebView){window.ReactNativeWebView.postMessage(JSON.stringify({type:'share',code:roomCode}));return;}
-      const url=document.getElementById('challenge-link').value;
-      if(navigator.share){try{await navigator.share({title:'Wizards Chess',url})}catch{}}else{document.getElementById('challenge-copy').click();}
+    document.getElementById('challenge-share-code').onclick=async()=>{
+      if(window.ReactNativeWebView){window.ReactNativeWebView.postMessage(JSON.stringify({type:'share-code',code:roomCode}));return;}
+      if(navigator.share){try{await navigator.share({text:challengeCodeMessage(roomCode)})}catch{}}else{document.getElementById('challenge-copy').click();}
     };
     document.getElementById('challenge-close').onclick=()=>document.getElementById('challenge-panel').classList.add('collapsed');
     // Challenge opener is owned by React, alongside the phone controls sheet.
@@ -4734,8 +4742,9 @@ export function initWizardChess() {
       const resume=invited;
       if(invited)document.getElementById('challenge-panel').classList.remove('collapsed');
       document.getElementById('challenge-code').value=resume;
-      document.getElementById('challenge-start').textContent=resume?'Join / watch game':'Create challenge';
+      document.getElementById('challenge-start').textContent='Create challenge';
       document.getElementById('challenge-start').disabled=false;
+      document.getElementById('challenge-join').disabled=false;
       if(invited) { aiAutoPlay=false; if(aiTimer){clearTimeout(aiTimer);aiTimer=null;} }
       animate();
     })();

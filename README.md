@@ -19,7 +19,7 @@ Open the QR code in Expo Go on Android. The first development launch downloads t
 - **Challenge a friend** lets the creator choose White, Black or Random.
 - The first guest who submits Join gets the other colour. Database row locks prevent two concurrent guests taking the same seat.
 - Later visitors watch as spectators. The server rejects their moves.
-- Copy or Share sends a challenge link using the current Expo Go address in development, or `wizardschess://challenge/CODE` in an installed app. App links require the receiving app to be installed. Universal HTTPS links and a download landing page are not configured in this test branch.
+- Copy or Share sends only the 12-character challenge code, without a URL or hosting address. Friends open the game and paste it into the challenge box to join automatically, or type the code and select Join / watch. Nicknames are optional. The first guest plays; subsequent guests watch. Older deep links remain supported for compatibility.
 - A guest reclaims their seat using their device's stored random token. Native identities are stored in SecureStore, not in shared browser tabs.
 - The app uses the existing mobile adaptive-quality profile and lighter mobile lighting. Desktop browser settings are unchanged.
 

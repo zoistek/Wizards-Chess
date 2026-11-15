@@ -9,6 +9,7 @@ import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking';
 import {WebView} from 'react-native-webview';
 import {roomFromUrl} from './src/links';
+import {challengeCodeMessage} from './src/challengeCode';
 
 function Game(){
  const web=useRef<WebView<{}>>(null),token=useRef(''),room=useRef(''),booted=useRef(false);
@@ -33,12 +34,11 @@ function Game(){
   try{
    const data=JSON.parse(raw);
    if(data.type==='ready'){
-    web.current?.injectJavaScript(`window.WC_PLAYER_TOKEN=${JSON.stringify(token.current)};window.WC_CONFIG.room=${JSON.stringify(room.current)};window.WC_CHALLENGE_BASE=${JSON.stringify(Linking.createURL('challenge/'))};window.WC_BOOT();true;`);
+    web.current?.injectJavaScript(`window.WC_PLAYER_TOKEN=${JSON.stringify(token.current)};window.WC_CONFIG.room=${JSON.stringify(room.current)};window.WC_BOOT();true;`);
     booted.current=true;
-   }else if((data.type==='copy'||data.type==='share')&&/^[A-F0-9]{12}$/.test(data.code)){
-    const url=Linking.createURL('challenge/'+data.code);
-    if(data.type==='copy'){await Clipboard.setStringAsync(url);web.current?.injectJavaScript("window.WC_NOTICE?.('Challenge link copied.');true;");}
-    else await Share.share({message:'Play Wizards Chess with me: '+url,url});
+   }else if((data.type==='copy-code'||data.type==='share-code')&&/^[A-F0-9]{12}$/.test(data.code)){
+    if(data.type==='copy-code'){await Clipboard.setStringAsync(data.code);web.current?.injectJavaScript("window.WC_NOTICE?.('Challenge code copied.');true;");}
+    else await Share.share({message:challengeCodeMessage(data.code)});
    }
   }catch{web.current?.injectJavaScript("window.WC_NOTICE?.('Could not share the challenge. Please try again.');true;");}
  }

@@ -1,0 +1,36 @@
+name: Wizards chess Android preview
+on:
+  workflow_dispatch:
+    inputs:
+      build:
+        description: Start the approved Android APK build after project verification
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: wizards-chess-android-preview
+  cancel-in-progress: false
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Verify existing Expo project
+        run: node scripts/resolve-expo-project.mjs
+      - name: Install app dependencies
+        if: inputs.build
+        run: npm ci
+      - name: Validate app
+        if: inputs.build
+        run: npm run typecheck && npm test && npm run prepare:game
+      - name: Start internal Android APK build
+        if: inputs.build
+        run: npx --yes eas-cli@27.10.0 build --platform android --profile preview --non-interactive --no-wait

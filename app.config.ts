@@ -1,7 +1,7 @@
 import type { ExpoConfig } from 'expo/config';
 const projectId=process.env.EXPO_PROJECT_ID;
 export default ():ExpoConfig=>({
- name:'Wizards chess',slug:'wizards-chess',version:'0.1.0',scheme:'wizardschess',orientation:'default',
+ name:'Wizards chess',...(process.env.EXPO_OWNER?{owner:process.env.EXPO_OWNER}:{}),slug:'wizards-chess',version:'0.1.0',scheme:'wizardschess',orientation:'default',
  icon:'./assets/wizards-chess-icon.png',
  userInterfaceStyle:'dark',backgroundColor:'#080a0f',
  ios:{supportsTablet:true,bundleIdentifier:'com.zoistek.wizardschess.test'},
